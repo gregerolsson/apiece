@@ -1,4 +1,8 @@
-import * as E from '../models/element';
+import * as E from '../elements';
+import * as O from '../operations';
+import * as S from 'json-schema';
+
+let schema: S.JSONSchema7;
 
 const example: E.ParseResultElement = {
   element: "parseResult",
@@ -20,7 +24,7 @@ const example: E.ParseResultElement = {
   ]
 }
 
-E.forEach(example.content, e => {
+O.forEach(example.content, e => {
   if (e.element === 'category') {
     processCategory(e);
   }
@@ -29,7 +33,7 @@ E.forEach(example.content, e => {
   }
 });
 
-E.forEach(example.content, e => {
+O.forEach(example.content, e => {
   switch (e.element) {
     case 'category': processCategory(e); break;
     case 'annotation': processAnnotation(e); break;

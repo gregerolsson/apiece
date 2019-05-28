@@ -1,0 +1,25 @@
+{
+  // Use TS from node_modules. Do npm link typescript
+  "typescript.tsdk": "./node_modules/typescript/lib",
+
+  // We use PostCSS -- SCSS is the closest thing.
+  "files.associations": {
+    "*.css": "scss"
+  },
+
+  // We use tab size 2 here.
+  "editor.tabSize": 2,
+
+  // And no actual tabs, please.
+  "editor.insertSpaces": true,
+	
+  // Excluded folders when searching, and more.	
+  "files.exclude": {
+    "**/lib": true,
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "**/node_modules": true
+  },
+
+  "git.ignoreLimitWarning": true
+}

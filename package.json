@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/json-schema": "^7.0.3",
     "marked-ts": "^1.0.0-beta.4",
     "preact": "^8.4.2"
   },

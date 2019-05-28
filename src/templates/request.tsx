@@ -1,4 +1,4 @@
-import * as E from '../models/element';
+import * as E from '../../models/element';
 import { h } from 'preact';
 
 interface RequestProps {
