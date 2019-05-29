@@ -3,7 +3,6 @@ import * as Op from './operations';
 
 import result from './tests/b';
 
-
 Op.forEach(result.content, e => {
   if (e.element === 'category') {
     processCategory(e);
@@ -28,5 +27,9 @@ function processCategory(e: El.CategoryElement) {
 }
 
 function processAnnotation(e: El.AnnotationElement) {
+
+}
+
+function processCopy(el: El.CopyElement) {
 
 }

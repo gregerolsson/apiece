@@ -1,12 +1,14 @@
-import * as E from '../../models/element';
+import * as E from '../elements';
 import { h } from 'preact';
 
 interface RequestProps {
   element: E.ResourceElement;
 }
 
-function Request(props: RequestProps) {
+export function Request(props: RequestProps) {
   return (
-    <h2>{props.element.meta}</h2>
+    <div class="element-request">
+      <h2>{props.element.meta}</h2>
+    </div>
   )
 }

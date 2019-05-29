@@ -76,6 +76,12 @@ export function some<T>(array: E.ArrayPrimitive<T>, predicate: (e: T) => boolean
   return items(array).some(predicate);
 }
 
+/**
+ * Returns the given string content (which may be this primitive itself, if
+ * it is not encapsulated in a StringElement).
+ * 
+ * @param primitive String or StringElement
+ */
 export function string<T>(primitive: E.StringPrimitive) {
   if (typeof primitive === 'string') {
     return primitive;

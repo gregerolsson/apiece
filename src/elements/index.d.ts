@@ -30,15 +30,72 @@ export type ElementType =
   "templatedHref"   |
   "transition"
 
+/** Any type of element */
+export type AnyElement =
+  AnnotationElement      |
+  ArrayElement<any>      |
+  AssetElement           |
+  BooleanElement         |
+  CategoryElement        |
+  CopyElement            |
+  DataStructureElement   |
+  EnumElement            |
+  ExtendElement          |
+  FailElement            |
+  HrefElement            |
+  HrefVariablesElement   |
+  HttpHeadersElement     |
+  HttpRequestElement     |
+  HttpResponseElement    |
+  HttpTransactionElement |
+  LinkElement            |
+  MemberElement          |
+  NullElement            |
+  NumberElement          |
+  ObjectElement          |
+  OptionElement          |
+  ParseResultElement     |
+  RefElement             |
+  ResourceElement        |
+  SelectElement          |
+  SourceMapElement       |
+  StringElement          |
+  TemplatedHrefElement   |
+  TransitionElement
+
+export type AnyDataStructureElement =
+  NullPrimitive       |
+  BooleanPrimitive    |
+  NumberPrimitive     |
+  StringPrimitive     |
+  ArrayPrimitive<any> |
+  ObjectElement       |
+  MemberElement       |
+  EnumElement         |
+  SelectElement       |
+  ExtendElement       |
+  RefElement
+
+/*
+ * ...
+ */
+export type StringPrimitive = string | StringElement;
+export type BooleanPrimitive = boolean | BooleanElement;
+export type NumberPrimitive = number | NumberElement;
+export type NullPrimitive = null | NullElement;
+export type ArrayPrimitive<T> = T[] | ArrayElement<T>; 
+export type TemplatedHrefPrimitive = string | TemplatedHrefElement;
+
+
 export type AttributesType = { [name: string]: AnyElement }
 
 /**
  * ...
  */
-export interface PrimitiveAttributes<T> {
+export interface PrimitiveAttributes<ContentType> {
   typeAttributes?: ArrayPrimitive<StringPrimitive>;
-  samples?: ArrayPrimitive<T>;
-  default?: T;
+  samples?: ArrayPrimitive<ContentType>;
+  default?: ContentType;
 }
 
 /**
@@ -91,18 +148,6 @@ export interface Element<ContentType, AttributesType = {}> {
   /** Element value defined by the type of this Element */
   content?: ContentType;
 }
-
-/*
- * ...
- */
-export type StringPrimitive = string | StringElement;
-export type BooleanPrimitive = boolean | BooleanElement;
-export type NumberPrimitive = number | NumberElement;
-export type NullPrimitive = null | NullElement;
-export type ArrayPrimitive<T> = T[] | ArrayElement<T>; 
-
-/** Any type of element */
-export type AnyElement = Element<any>;
 
 /*
 export type AnyPrimitive =
@@ -177,12 +222,12 @@ export type ObjectContent =
 
 export type ObjectAttributes = PrimitiveAttributes<ObjectElement>;
 
-export interface ObjectElement extends Element<ArrayElement<ObjectContent>> {
+export interface ObjectElement extends Element<ArrayPrimitive<ObjectContent>> {
   element: "object";
 }
 
 export interface EnumAttributes extends PrimitiveAttributes<AnyElement> {
-  enumerations: ArrayElement<AnyElement>;
+  enumerations: ArrayPrimitive<AnyElement>;
 }
 
 export interface EnumElement extends Element<AnyElement, EnumAttributes> {
@@ -193,7 +238,7 @@ export interface OptionElement {
   element: "option";
 }
 
-export interface SelectElement extends Element<ArrayElement<OptionElement>> {
+export interface SelectElement extends Element<ArrayPrimitive<OptionElement>> {
   element: "select";
 }
 
@@ -232,7 +277,18 @@ export interface ParseResultElement extends Element<ArrayPrimitive<ParseResultCo
   element: "parseResult";
 }
 
-export interface ResourceElement extends Element<null> {
+export interface ResourceAttributes {
+  href: TemplatedHrefPrimitive;
+  hrefVariables?: HrefVariablesElement;
+}
+
+type ResourceContent =
+  CopyElement       |
+  CategoryElement   |
+  TransitionElement |
+  DataStructureElement
+
+export interface ResourceElement extends Element<ArrayPrimitive<ResourceContent>, ResourceAttributes> {
   element: "resource";
 }
 
@@ -241,13 +297,21 @@ export interface CategoryAttributes {
   version: string;
 }
 
-export interface CategoryElement extends Element<any> {
+export interface CategoryElement extends Element<ArrayPrimitive<AnyElement>, CategoryAttributes> {
   element: "category"
 }
 
-export type SourceMapContent = ArrayElement<ArrayElement<NumberPrimitive>>;
+export interface CopyElementAttributes {
+  contentType: StringPrimitive;
+}
 
-export interface SourceMapElement extends Element<SourceMapContent> {
+export interface CopyElement extends Element<StringPrimitive, CopyElementAttributes> {
+  element: "copy"
+}
+
+export type SourceMapContent = ArrayPrimitive<ArrayElement<NumberPrimitive>>;
+
+export interface SourceMapElement extends Element<SourceMapContent, SourceMapContent> {
   element: "sourceMap";
 }
 
@@ -265,9 +329,58 @@ export interface HrefVariablesElement {
 
 export interface AnnotationAttributes {
   code: NumberPrimitive;
-  sourceMap: ArrayElement<SourceMapElement>;
+  sourceMap: ArrayPrimitive<SourceMapElement>;
 }
 
 export interface AnnotationElement extends Element<string, AnnotationAttributes> {
   element: 'annotation'
+}
+
+export interface DataStructureElement extends Element<ArrayPrimitive<AnyDataStructureElement>> {
+  element: 'dataStructure'
+}
+
+export interface HttpHeadersElement extends Element<ArrayPrimitive<MemberElement>> {
+  element: "httpHeaders";
+}
+
+export interface HttpRequestElement extends Element<any> {
+  element: "httpRequest";
+}
+
+export interface HttpResponseAttributes {
+  statusCode: NumberPrimitive;
+  headers: HttpHeadersElement;
+}
+
+export interface HttpResponseElement extends Element<any, HttpResponseAttributes> {
+  element: "httpResponse";
+}
+
+export interface HttpTransactionElement extends Element<any> {
+  element: "httpTransaction";
+}
+
+export interface AssetElement extends Element<any> {
+  element: "asset";
+}
+
+export interface FailElement extends Element<any> {
+  element: "fail";
+}
+
+export interface TransitionAttributes {
+  relation?: StringPrimitive;
+  href: TemplatedHrefElement;
+  hrefVariables?: HrefVariablesElement;
+  data?: DataStructureElement;
+  contentTypes?: ArrayPrimitive<StringPrimitive>;
+}
+
+type TransitionContent =
+  CopyElement |
+  HttpTransactionElement;
+
+export interface TransitionElement extends Element<any, TransitionAttributes> {
+  element: "transition";
 }
