@@ -1,4 +1,4 @@
-import * as E from '../elements';
+import * as El from '../elements';
 
 interface TypePredicate<T> {
   (e: any): e is T
@@ -11,25 +11,25 @@ interface TypePredicate<T> {
  * 
  * @param element Element type to check for
  */
-function predicate<T extends E.AnyElement>(element: E.ElementType): TypePredicate<T> {
-  return (e: E.AnyElement): e is T => (e && e.element === element);
+function predicate<T extends El.AnyElement>(element: El.ElementType): TypePredicate<T> {
+  return (e: El.AnyElement): e is T => (e && e.element === element);
 }
 
-export const isAnnotation = predicate<E.AnnotationElement>('annotation');
-export const isCategory = predicate<E.CategoryElement>('category');
-export const isExtend = predicate<E.ExtendElement>('extend');
-export const isMember = predicate<E.MemberElement>('member');
-export const isObject = predicate<E.ObjectElement>("object");
-export const isRef = predicate<E.RefElement>('ref');
+export const isAnnotation = predicate<El.AnnotationElement>('annotation');
+export const isCategory = predicate<El.CategoryElement>('category');
+export const isExtend = predicate<El.ExtendElement>('extend');
+export const isMember = predicate<El.MemberElement>('member');
+export const isObject = predicate<El.ObjectElement>("object");
+export const isRef = predicate<El.RefElement>('ref');
 
-export function find<T>(from: E.AnyElement, type: E.ElementType) {
+export function find<T>(from: El.AnyElement, type: El.ElementType) {
   if (from.element === type)  {
     return from;
   }
 
-  if (Array.isArray(from.content)) {
+  //if (Array.isArray(from.content)) {
     // from.content.find(e => find<T>(e, type))
-  }
+  //}
 }
 
 /**
@@ -38,7 +38,7 @@ export function find<T>(from: E.AnyElement, type: E.ElementType) {
  * 
  * @param array Native Array or ArrayElement
  */
-export function items<T>(array: E.ArrayPrimitive<T>) {
+export function items<T>(array: El.ArrayPrimitive<T>) {
   return Array.isArray(array)
     ? array
     : array.content;
@@ -51,8 +51,18 @@ export function items<T>(array: E.ArrayPrimitive<T>) {
  * @param array ArrayElement<T> | T[] to iterate over
  * @param iter Iterator function
  */
-export function filter<U extends E.AnyElement>(array: E.ArrayPrimitive<any>, pred: TypePredicate<U>): U[] {
+export function filter<U extends El.AnyElement>(array: El.ArrayPrimitive<any>, pred: TypePredicate<U>): U[] {
   return items(array).filter(pred);
+}
+
+/**
+ * Maps...
+ * 
+ * @param array ArrayElement<T> | T[] to iterate over
+ * @param iter Iterator function
+ */
+export function map<T>(array: El.ArrayPrimitive<T>, iter: (e: T) => void) {
+  return items(array).map(iter);
 }
 
 /**
@@ -62,7 +72,7 @@ export function filter<U extends E.AnyElement>(array: E.ArrayPrimitive<any>, pre
  * @param array ArrayElement<T> | T[] to iterate over
  * @param iter Iterator function
  */
-export function forEach<T>(array: E.ArrayPrimitive<T>, iter: (e: T) => void) {
+export function forEach<T>(array: El.ArrayPrimitive<T>, iter: (e: T) => void) {
   return items(array).forEach(iter);
 }
 
@@ -72,7 +82,7 @@ export function forEach<T>(array: E.ArrayPrimitive<T>, iter: (e: T) => void) {
  * @param array ArrayElement<T> | T[] to iterate over
  * @param predicate Predicate function
  */
-export function some<T>(array: E.ArrayPrimitive<T>, predicate: (e: T) => boolean) {
+export function some<T>(array: El.ArrayPrimitive<T>, predicate: (e: T) => boolean) {
   return items(array).some(predicate);
 }
 
@@ -82,7 +92,7 @@ export function some<T>(array: E.ArrayPrimitive<T>, predicate: (e: T) => boolean
  * 
  * @param primitive String or StringElement
  */
-export function string<T>(primitive: E.StringPrimitive) {
+export function string<T>(primitive: El.StringPrimitive | El.TemplatedHrefPrimitive) {
   if (typeof primitive === 'string') {
     return primitive;
   }
@@ -94,10 +104,22 @@ export function string<T>(primitive: E.StringPrimitive) {
  * @param el 
  * @param name 
  */
-export function hasClass(el: E.AnyElement, name: string) {
+export function hasClass(el: El.Element<any>, name: string) {
   const classes = el.meta.classes;
 
   return some(classes, c =>
     string(c) === name
   );
+}
+
+/**
+ * 
+ * @param el 
+ */
+export function title(el: El.Element<any>) {
+  if (el.meta && el.meta.title) {
+    return string(el.meta.title)
+  }
+
+  return null;
 }

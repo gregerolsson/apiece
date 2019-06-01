@@ -2,7 +2,7 @@ import * as E from '../elements';
 import { h } from 'preact';
 
 interface RequestProps {
-  element: E.ResourceElement;
+  element: E.HttpRequestElement;
 }
 
 export function Request(props: RequestProps) {

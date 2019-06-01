@@ -1,0 +1,35 @@
+@import 'carbon-components/scss/globals/scss/vendor/@carbon/elements/scss/themes/theme-maps';
+
+$carbon--theme: $carbon--theme--g90;
+
+@import 'carbon-components/scss/globals/scss/styles.scss';
+
+body {
+  padding: carbon--mini-units(6) carbon--mini-units(4);
+}
+
+h1 {
+  @include type-style('productive-heading-04');
+  margin-top: carbon--mini-units(6);
+  margin-bottom: carbon--mini-units(3);
+}
+
+h2 {
+  @include type-style('productive-heading-03');
+  margin-top: carbon--mini-units(4);
+  margin-bottom: carbon--mini-units(2);
+}
+
+p {
+  @include type-style('body-long-02');
+  padding: 0 0 carbon--mini-units(2);
+}
+
+code {
+  @include type-style('code-01');
+  background-color: $ui-03;
+  border-radius: 4px;
+  padding: .0625rem .5rem;  
+}
+
+@import '../templates/ui/list.scss';

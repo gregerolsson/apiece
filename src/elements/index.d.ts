@@ -1,3 +1,4 @@
+/** The `element` attribute on an element may be any of these strings */
 export type ElementType =
   "annotation"      |
   "array"           |
@@ -30,7 +31,7 @@ export type ElementType =
   "templatedHref"   |
   "transition"
 
-/** Any type of element */
+/** Any type of known element */
 export type AnyElement =
   AnnotationElement      |
   ArrayElement<any>      |
@@ -63,6 +64,7 @@ export type AnyElement =
   TemplatedHrefElement   |
   TransitionElement
 
+/** Any type of element used for data structures */
 export type AnyDataStructureElement =
   NullPrimitive       |
   BooleanPrimitive    |
@@ -86,7 +88,7 @@ export type NullPrimitive = null | NullElement;
 export type ArrayPrimitive<T> = T[] | ArrayElement<T>; 
 export type TemplatedHrefPrimitive = string | TemplatedHrefElement;
 
-
+/** Attributes is a key/value map of names to elements */
 export type AttributesType = { [name: string]: AnyElement }
 
 /**
@@ -125,12 +127,7 @@ export interface MetaType {
 }
 
 /**
- * An Element SHALL be a tuple (`element`, `meta`, `attributes`, `content`) where
- * 
- * `element` SHALL be a non-empty, finite character string identifying the type of this Element
- * `meta` SHALL be a set of properties, some of which have reserved semantics
- * `attributes` SHALL be a set of properties defined by the type of this Element
- * `content` SHALL be defined by the type of this Element
+ * An Element SHALL be a tuple (`element`, `meta`, `attributes`, `content`)
  *
  * @see http://apielements.org/en/latest/element-definitions.html#element
  */
@@ -150,51 +147,196 @@ export interface Element<ContentType, AttributesType = {}> {
 }
 
 /*
-export type AnyPrimitive =
-  StringPrimitive  |
-  BooleanPrimitive |
-  NumberPrimitive  |
-  NullPrimitive    |
-  ArrayPrimitive<any>
-
-export type AnyElementOrPrimitive = AnyElement | AnyPrimitive;
-*/
-
-/*
- * - - - - - - - - - - - - - - - -
+ * Element Definitions
  */
 
-type StringAttributes = PrimitiveAttributes<StringPrimitive>;
+export interface AnnotationAttributes {
+  code: NumberPrimitive;
+  sourceMap: ArrayPrimitive<SourceMapElement>;
+}
 
 /**
- * Type with domain of all finite character strings.
- * 
- * @see http://apielements.org/en/latest/element-definitions.html#string-element
+ * @see https://apielements.org/en/latest/element-definitions.html#annotation-string
  */
-export interface StringElement extends Element<string, StringAttributes> {
-  element: "string";
+export interface AnnotationElement extends Element<string, AnnotationAttributes> {
+  element: 'annotation'
 }
 
 type ArrayAttributes<T> = PrimitiveAttributes<ArrayPrimitive<T>>;
 
+/**
+ * @see https://apielements.org/en/latest/element-definitions.html#array-element
+ */
 export interface ArrayElement<T> extends Element<T[], ArrayAttributes<T>> {
   element: "array";
 }
 
-export interface NullElement {
-  element: "null";
+export interface AssetAttributes {
+  contentType: StringPrimitive;
+  href: HrefElement;
+}
+
+/**
+ * @see https://apielements.org/en/latest/element-definitions.html#asset-string
+ */
+export interface AssetElement extends Element<string, AssetAttributes> {
+  element: "asset";
 }
 
 type BooleanAttributes = PrimitiveAttributes<BooleanPrimitive>;
 
+/**
+ * @see https://apielements.org/en/latest/element-definitions.html#boolean-element
+ */
 export interface BooleanElement extends Element<boolean, BooleanAttributes> {
   element: "null";
 }
 
-type NumberAttributes = PrimitiveAttributes<NumberPrimitive>;
+export interface CategoryAttributes {
+  metadata: ArrayPrimitive<any>;
+  version: string;
+}
 
-export interface NumberElement extends Element<number, NumberAttributes> {
-  element: "number";
+/**
+ * @see https://apielements.org/en/latest/element-definitions.html#category
+ */
+export interface CategoryElement extends Element<ArrayPrimitive<AnyElement>, CategoryAttributes> {
+  element: "category"
+}
+
+export interface CopyElementAttributes {
+  contentType: StringPrimitive;
+}
+
+/**
+ * @see https://apielements.org/en/latest/element-definitions.html#copy-string
+ */
+export interface CopyElement extends Element<StringPrimitive, CopyElementAttributes> {
+  element: "copy"
+}
+
+/**
+ * @see https://apielements.org/en/latest/element-definitions.html#data-structure
+ */
+export interface DataStructureElement extends Element<ArrayPrimitive<AnyDataStructureElement>> {
+  element: 'dataStructure'
+}
+
+export interface EnumAttributes extends PrimitiveAttributes<AnyElement> {
+  enumerations: ArrayPrimitive<AnyElement>;
+}
+
+/**
+ * @see https://apielements.org/en/latest/element-definitions.html#enum-element
+ */
+export interface EnumElement extends Element<AnyElement, EnumAttributes> {
+  element: "enum";
+}
+
+type ExtendContent =
+  ArrayPrimitive<any> |
+  ObjectElement       |
+  SelectElement       |
+  StringPrimitive     |
+  BooleanPrimitive    |
+  NumberPrimitive     |
+  RefElement
+
+/**
+ * @see https://apielements.org/en/latest/element-definitions.html#extend-element
+ */
+export interface ExtendElement extends Element<ArrayPrimitive<ExtendContent>> {
+  element: "extend";
+}
+
+/**
+ * @see https://apielements.org/en/latest/element-definitions.html#fail-element
+ */
+export interface FailElement extends Element<any> {
+  element: "fail";
+}
+
+/**
+ * @see https://apielements.org/en/latest/element-definitions.html#href-string
+ */
+export interface HrefElement extends Element<StringPrimitive> {
+  element: "href"
+}
+
+/**
+ * @see https://apielements.org/en/latest/element-definitions.html#href-variables-object
+ */
+export interface HrefVariablesElement {
+  element: "hrefVariables";
+}
+
+/**
+ * @see https://apielements.org/en/latest/element-definitions.html#http-headers-object
+ */
+export interface HttpHeadersElement extends Element<ArrayPrimitive<MemberElement>> {
+  element: "httpHeaders";
+}
+
+interface HttpMessageAttributes {
+  headers: HttpHeadersElement;
+}
+
+type HttpMessagePayload =
+  CopyElement |
+  DataStructureElement |
+  AssetElement;
+
+interface HttpRequestAttributes extends HttpMessageAttributes {
+  method: StringPrimitive;
+  href?: TemplatedHrefElement;
+  hrefVariables?: HrefVariablesElement;
+}
+
+/**
+ * @see https://apielements.org/en/latest/element-definitions.html#http-request-message-http-message-payload
+ */
+export interface HttpRequestElement extends Element<ArrayPrimitive<HttpMessagePayload>, HttpRequestAttributes> {
+  element: "httpRequest";
+}
+
+export interface HttpResponseAttributes extends HttpMessageAttributes {
+  statusCode: NumberPrimitive;
+}
+
+/**
+ * @see https://apielements.org/en/latest/element-definitions.html#http-response-message-http-message-payload
+ */
+export interface HttpResponseElement extends Element<ArrayPrimitive<HttpMessagePayload>, HttpResponseAttributes> {
+  element: "httpResponse";
+}
+
+interface HttpTransactionAttributes {
+  authSchemes: ArrayPrimitive<StringElement>; // FIXME
+}
+
+type HttpTransactionContent =
+  CopyElement         |
+  HttpRequestElement  |
+  HttpResponseElement;
+
+/**
+ * @see https://apielements.org/en/latest/element-definitions.html#asset-string
+ */
+export interface HttpTransactionElement extends Element<ArrayPrimitive<HttpTransactionContent>, HttpTransactionAttributes> {
+  element: "httpTransaction";
+}
+
+
+/**
+ * @see http://apielements.org/en/latest/element-definitions.html#link-element
+ */
+export interface LinkElement {
+  element: "link";
+
+  attributes: {
+    relation: StringPrimitive;
+    href: StringPrimitive;
+  }
 }
 
 export interface MemberContent {
@@ -210,8 +352,27 @@ export interface MemberAttributes {
   variable: BooleanPrimitive;
 }
 
+/**
+ * @see https://apielements.org/en/latest/element-definitions.html#member-element
+ */
 export interface MemberElement extends Element<MemberContent, MemberAttributes> {
   element: "member";
+}
+
+/**
+ * @see https://apielements.org/en/latest/element-definitions.html#null-element
+ */
+export interface NullElement {
+  element: "null";
+}
+
+type NumberAttributes = PrimitiveAttributes<NumberPrimitive>;
+
+/**
+ * @see https://apielements.org/en/latest/element-definitions.html#number-element
+ */
+export interface NumberElement extends Element<number, NumberAttributes> {
+  element: "number";
 }
 
 export type ObjectContent =
@@ -222,59 +383,36 @@ export type ObjectContent =
 
 export type ObjectAttributes = PrimitiveAttributes<ObjectElement>;
 
+/**
+ * @see https://apielements.org/en/latest/element-definitions.html#object-element
+ */
 export interface ObjectElement extends Element<ArrayPrimitive<ObjectContent>> {
   element: "object";
 }
 
-export interface EnumAttributes extends PrimitiveAttributes<AnyElement> {
-  enumerations: ArrayPrimitive<AnyElement>;
-}
-
-export interface EnumElement extends Element<AnyElement, EnumAttributes> {
-  element: "enum";
-}
-
+/**
+ * @see https://apielements.org/en/latest/element-definitions.html#option-element
+ */
 export interface OptionElement {
   element: "option";
-}
-
-export interface SelectElement extends Element<ArrayPrimitive<OptionElement>> {
-  element: "select";
-}
-
-export interface ExtendElement {
-  element: "extend";
-}
-
-/**
- * Hyperlinking MAY be used to link to other resources, provide links to instructions on how to process a
- * given element (by way of a profile or other means), and may be used to provide meta data about the element
- * in which it’s found. The meaning and purpose of the hyperlink is defined by the link relation according
- * to RFC 5988.
- * 
- * @see http://apielements.org/en/latest/element-definitions.html#link-element
- * @see http://apielements.org/en/latest/element-definitions.html#profiles
- * @see https://tools.ietf.org/html/rfc5988
- */
-export interface LinkElement {
-  element: "link";
-
-  attributes: {
-    relation: StringPrimitive;
-    href: StringPrimitive;
-  }
-}
-
-export interface RefElement {
-  element: "ref";
 }
 
 export type ParseResultContent =
   CategoryElement |
   AnnotationElement;
 
+/**
+ * @see https://apielements.org/en/latest/element-definitions.html#parse-result-array
+ */
 export interface ParseResultElement extends Element<ArrayPrimitive<ParseResultContent>> {
   element: "parseResult";
+}
+
+/**
+ * @see https://apielements.org/en/latest/element-definitions.html#ref-element
+ */
+export interface RefElement {
+  element: "ref";
 }
 
 export interface ResourceAttributes {
@@ -288,85 +426,43 @@ type ResourceContent =
   TransitionElement |
   DataStructureElement
 
+/**
+ * @see https://apielements.org/en/latest/element-definitions.html#resource
+ */
 export interface ResourceElement extends Element<ArrayPrimitive<ResourceContent>, ResourceAttributes> {
   element: "resource";
 }
 
-export interface CategoryAttributes {
-  metadata: ArrayPrimitive<any>;
-  version: string;
-}
-
-export interface CategoryElement extends Element<ArrayPrimitive<AnyElement>, CategoryAttributes> {
-  element: "category"
-}
-
-export interface CopyElementAttributes {
-  contentType: StringPrimitive;
-}
-
-export interface CopyElement extends Element<StringPrimitive, CopyElementAttributes> {
-  element: "copy"
+/**
+ * @see https://apielements.org/en/latest/element-definitions.html#select-element
+ */
+export interface SelectElement extends Element<ArrayPrimitive<OptionElement>> {
+  element: "select";
 }
 
 export type SourceMapContent = ArrayPrimitive<ArrayElement<NumberPrimitive>>;
 
+/**
+ * @see https://apielements.org/en/latest/element-definitions.html#source-map
+ */
 export interface SourceMapElement extends Element<SourceMapContent, SourceMapContent> {
   element: "sourceMap";
 }
 
-export interface HrefElement extends Element<string> {
-  element: "href"
+type StringAttributes = PrimitiveAttributes<StringPrimitive>;
+
+/**
+ * @see http://apielements.org/en/latest/element-definitions.html#string-element
+ */
+export interface StringElement extends Element<string, StringAttributes> {
+  element: "string";
 }
 
-export interface TemplatedHrefElement extends Element<string> {
+/**
+ * @see https://apielements.org/en/latest/element-definitions.html#templated-href-string
+ */
+export interface TemplatedHrefElement extends Element<string, StringAttributes> {
   element: "templatedHref"
-}
-
-export interface HrefVariablesElement {
-  element: "hrefVariables";
-}
-
-export interface AnnotationAttributes {
-  code: NumberPrimitive;
-  sourceMap: ArrayPrimitive<SourceMapElement>;
-}
-
-export interface AnnotationElement extends Element<string, AnnotationAttributes> {
-  element: 'annotation'
-}
-
-export interface DataStructureElement extends Element<ArrayPrimitive<AnyDataStructureElement>> {
-  element: 'dataStructure'
-}
-
-export interface HttpHeadersElement extends Element<ArrayPrimitive<MemberElement>> {
-  element: "httpHeaders";
-}
-
-export interface HttpRequestElement extends Element<any> {
-  element: "httpRequest";
-}
-
-export interface HttpResponseAttributes {
-  statusCode: NumberPrimitive;
-  headers: HttpHeadersElement;
-}
-
-export interface HttpResponseElement extends Element<any, HttpResponseAttributes> {
-  element: "httpResponse";
-}
-
-export interface HttpTransactionElement extends Element<any> {
-  element: "httpTransaction";
-}
-
-export interface AssetElement extends Element<any> {
-  element: "asset";
-}
-
-export interface FailElement extends Element<any> {
-  element: "fail";
 }
 
 export interface TransitionAttributes {
@@ -381,6 +477,9 @@ type TransitionContent =
   CopyElement |
   HttpTransactionElement;
 
-export interface TransitionElement extends Element<any, TransitionAttributes> {
+/**
+ * @see https://apielements.org/en/latest/element-definitions.html#transition
+ */
+export interface TransitionElement extends Element<ArrayPrimitive<TransitionContent>, TransitionAttributes> {
   element: "transition";
 }

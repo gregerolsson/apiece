@@ -38,7 +38,7 @@ const data: E.ParseResultElement = {
                   "content": [
                     {
                       "element": "copy",
-                      "content": "Some description"
+                      "content": "Some description using **Markdown**\n\n- Unordered\n- List"
                     },
                     {
                       "element": "httpTransaction",

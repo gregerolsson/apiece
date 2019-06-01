@@ -11,10 +11,15 @@
   "license": "ISC",
   "dependencies": {
     "@types/json-schema": "^7.0.3",
+    "carbon-components": "^10.2.0",
     "marked-ts": "^1.0.0-beta.4",
-    "preact": "^8.4.2"
+    "node-sass": "^4.12.0",
+    "preact": "^8.4.2",
+    "preact-render-to-string": "^4.1.0",
+    "tslib": "^1.9.3"
   },
   "devDependencies": {
-    "@types/node": "^12.0.2"
+    "@types/node": "^12.0.2",
+    "@types/node-sass": "^4.11.0"
   }
 }
