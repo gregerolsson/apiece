@@ -4,6 +4,8 @@ import * as UI from './ui';
 import { render } from './render';
 import { h } from 'preact';
 
+import schema from '../tests/schemas/page';
+
 interface ParseResultProps {
   element: El.ParseResultElement;
 }
@@ -24,6 +26,8 @@ export function ParseResult(props: ParseResultProps) {
               render(c)
             )
           }
+          <h1>Schema</h1>
+          <UI.Schema schema={schema} />          
         </main>
       </body>
     </html>
